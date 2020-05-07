@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios'; //Only import if using api
 
-import {addData} from "../actions";
+import {addData,deleteSingle} from "../actions";
 import Data from "../instructions";
 
 export default function Home(props) {
@@ -15,8 +15,8 @@ export default function Home(props) {
     const [isFetching, setIsFetching] = useState(false);
 
     //Access Redux Store State
-    const dataReducer = useSelector((state) => state.dataReducer);
-    const { data } = dataReducer;
+    const dataReducerState = useSelector((state) => state.dataReducer);
+    const { data } = dataReducerState;
 
     //==================================================================================================
 
@@ -29,30 +29,39 @@ export default function Home(props) {
     const getData = () => {
         setIsFetching(true);
 
-        //OPTION 1 - LOCAL DATA using instructions.json file
-        //delay the retrieval [Sample reasons only]
-        setTimeout(() => {
-            const data  = Data.instructions;
-            dispatch(addData(data));
-            setIsFetching(false);
-        }, 2000);
+        // //OPTION 1 - LOCAL DATA using instructions.json file
+        // //delay the retrieval [Sample reasons only]
+        // setTimeout(() => {
+        //     const data  = Data.instructions;
+        //     dispatch(addData(data));
+        //     setIsFetching(false);
+        // }, 2000);
 
         //OPTION 2 - API CALL
-        // let url = "https://my-json-server.typicode.com/mesandigital/demo/instructions";
-        // axios.get(url)
-        //     .then(res => res.data)
-        //     .then((data) => dispatch(addData(data)))
-        //     .catch(error => alert(error.message))
-        //     .finally(() => setIsFetching(false));
+        let url = "https://my-json-server.typicode.com/mesandigital/demo/instructions";
+        axios.get(url)
+            .then(res => res.data)
+            .then((data) => dispatch(addData(data)))
+            .catch(error => alert(error.message))
+            .finally(() => setIsFetching(false));
     };
 
     //==================================================================================================
+    const deleteItem = (title) => {
+        dispatch(deleteSingle(title))
+    }
+
+
+
+
 
     //4 - RENDER FLATLIST ITEM
     const renderItem = ({item, index}) => {
         return (
             <View style={styles.row}>
-                <Text style={styles.title}>
+                <Text style={styles.title} onPress={()=>{
+                    deleteItem(item.title);
+                }}>
                     {(parseInt(index) + 1)}{". "}{item.title}
                 </Text>
                 <Text style={styles.description}>
